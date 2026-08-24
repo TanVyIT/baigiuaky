@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -10,17 +11,21 @@ public class Student {
 
     @Id
     private int id;
+    @Column(name = "name", columnDefinition = "NVARCHAR(255)")
     private String name;
     private int age;
     private String email;
+    @Column(name = "gender", columnDefinition = "NVARCHAR(20)")
+    private String gender;
 
     public Student() {
     }
 
-    public Student(int id, String name, int age) {
+    public Student(int id, String name, int age, String gender) {
         this.id = id;
         this.name = name;
         this.age = age;
+        this.gender = gender;
     }
 
     // Getter & Setter
@@ -55,5 +60,13 @@ public class Student {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+}
 
 }

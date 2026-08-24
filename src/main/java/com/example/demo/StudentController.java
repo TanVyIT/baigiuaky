@@ -2,35 +2,41 @@ package com.example.demo;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 
-@RestController
+@Controller
 public class StudentController {
     @Autowired
     private StudentService studentService;
 
     @GetMapping("/students")
-    public List<Student> listStudents() {
-        return studentService.getAllStudents();
+    public String listStudents(Model model) {
+        model.addAttribute("students", studentService.getAllStudents());
+        return "students";
     }
 
     @GetMapping("/api/students")
+    @ResponseBody
     public List<Student> getStudents() {
         List<Student> list = new java.util.ArrayList<>();
-        list.add(new Student(1, "A", 20));
-        list.add(new Student(2, "B", 21));
+        list.add(new Student(1, "Nguyễn Văn A", 20, "Nam"));
+        list.add(new Student(2, "Trần Thị B", 21, "Nữ"));
         return list;
     }
 
     @GetMapping("/api/student")
+    @ResponseBody
     public Student getStudent() {
-        return new Student(1, "Nguyen Van A", 20);
+        return new Student(1, "Nguyễn Văn A", 20, "Nam");
     }
 
     @GetMapping({"/students/{id}", "/api/student/{id}"})
+    @ResponseBody
     public ResponseEntity<Student> getStudentById(@PathVariable int id) {
         return studentService.getStudentById(id)
                 .map(ResponseEntity::ok)
