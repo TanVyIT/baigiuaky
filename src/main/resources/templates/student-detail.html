@@ -46,6 +46,11 @@
             <a th:href="@{/students}" class="btn btn-secondary">
                 Quay lại
             </a>
+            <a th:href="@{/students/{id}/edit(id=${student.id})}" class="btn btn-warning">Sửa</a>
+            <form th:action="@{/students/{id}/delete(id=${student.id})}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Bạn có chắc muốn xóa sinh viên này?')">Xóa</button>
+            </form>
         </div>
     </div>
 </div>

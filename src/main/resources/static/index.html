@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quản lý sinh viên</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1100px; margin: 32px auto; padding: 0 16px; color: #1f2937; }
+        h1 { color: #0d6efd; }
+        form, .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        input, button { padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 4px; }
+        input { flex: 1 1 150px; }
+        button { cursor: pointer; background: #0d6efd; color: white; border: 0; }
+        button.delete { background: #dc3545; }
+        button.edit { background: #f59e0b; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: left; }
+        th { background: #212529; color: white; }
+        #message { min-height: 24px; color: #198754; }
+        .actions { display: flex; gap: 6px; }
+    </style>
+</head>
+<body>
+<h1>Quản lý sinh viên</h1>
+<p id="message"></p>
+
+<form id="student-form">
+    <input id="id" type="number" placeholder="ID" required>
+    <input id="name" placeholder="Họ tên" required>
+    <input id="age" type="number" min="1" placeholder="Tuổi" required>
+    <input id="gender" placeholder="Giới tính" required>
+    <input id="email" type="email" placeholder="Email" required>
+    <button type="submit">Thêm sinh viên</button>
+    <button type="button" id="cancel-edit" hidden>Hủy sửa</button>
+</form>
+
+<form id="search-form" class="toolbar">
+    <input id="keyword" placeholder="Tìm theo tên sinh viên">
+    <button type="submit">Tìm kiếm</button>
+    <button type="button" id="show-all">Hiển thị tất cả</button>
+</form>
+
+<table>
+    <thead><tr><th>ID</th><th>Họ tên</th><th>Tuổi</th><th>Giới tính</th><th>Email</th><th>Thao tác</th></tr></thead>
+    <tbody id="student-list"></tbody>
+</table>
+
+<script>
+    const api = '/api/students';
+    const form = document.getElementById('student-form');
+    let editingId = null;
+
+    function value(id) { return document.getElementById(id).value.trim(); }
+    function showMessage(text, error = false) {
+        const message = document.getElementById('message');
+        message.textContent = text;
+        message.style.color = error ? '#dc3545' : '#198754';
+    }
+
+    async function loadStudents(url = api) {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Không thể tải danh sách sinh viên');
+        const students = await response.json();
+        const list = document.getElementById('student-list');
+        list.innerHTML = students.length ? students.map(student => `
+            <tr><td>${student.id}</td><td>${student.name ?? ''}</td><td>${student.age}</td>
+            <td>${student.gender ?? ''}</td><td>${student.email ?? ''}</td>
+            <td class="actions"><button class="edit" onclick="editStudent(${student.id})">Sửa</button>
+            <button class="delete" onclick="deleteStudent(${student.id})">Xóa</button></td></tr>`).join('')
+            : '<tr><td colspan="6">Không tìm thấy sinh viên</td></tr>';
+    }
+
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const student = { id: Number(value('id')), name: value('name'), age: Number(value('age')), gender: value('gender'), email: value('email') };
+        const url = editingId === null ? api : `${api}/update/${editingId}`;
+        const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(student) });
+        if (!response.ok) { showMessage('Không thể lưu sinh viên', true); return; }
+        showMessage(editingId === null ? 'Đã thêm sinh viên' : 'Đã cập nhật sinh viên');
+        resetForm();
+        await loadStudents();
+    });
+
+    async function editStudent(id) {
+        const response = await fetch(`${api}/${id}`);
+        const student = await response.json();
+        ['id', 'name', 'age', 'gender', 'email'].forEach(field => document.getElementById(field).value = student[field] ?? '');
+        editingId = id;
+        document.querySelector('#student-form button[type="submit"]').textContent = 'Cập nhật sinh viên';
+        document.getElementById('cancel-edit').hidden = false;
+    }
+
+    async function deleteStudent(id) {
+        if (!confirm('Bạn có chắc muốn xóa sinh viên này?')) return;
+        const response = await fetch(`${api}/delete/${id}`, { method: 'POST' });
+        if (!response.ok) { showMessage('Không thể xóa sinh viên', true); return; }
+        showMessage('Đã xóa sinh viên');
+        await loadStudents();
+    }
+
+    function resetForm() {
+        form.reset();
+        editingId = null;
+        document.querySelector('#student-form button[type="submit"]').textContent = 'Thêm sinh viên';
+        document.getElementById('cancel-edit').hidden = true;
+    }
+
+    document.getElementById('cancel-edit').addEventListener('click', resetForm);
+    document.getElementById('show-all').addEventListener('click', () => { document.getElementById('keyword').value = ''; loadStudents(); });
+    document.getElementById('search-form').addEventListener('submit', event => {
+        event.preventDefault();
+        const keyword = value('keyword');
+        loadStudents(keyword ? `${api}/search?name=${encodeURIComponent(keyword)}` : api);
+    });
+    loadStudents().catch(error => showMessage(error.message, true));
+</script>
+</body>
+</html>

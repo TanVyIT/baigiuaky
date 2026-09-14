@@ -19,6 +19,11 @@
         </div>
 
         <div class="card-body">
+            <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+            <div class="mb-3">
+                <a th:href="@{/students/new}" class="btn btn-success">Thêm sinh viên</a>
+            </div>
+
             <form th:action="@{/students}" method="get"
                   class="row g-2 mb-4">
 
@@ -70,6 +75,13 @@
                                class="btn btn-info btn-sm">
                                 Chi tiết
                             </a>
+                                     <a th:href="@{/students/{id}/edit(id=${student.id})}"
+                                         class="btn btn-warning btn-sm">Sửa</a>
+                                     <form th:action="@{/students/{id}/delete(id=${student.id})}"
+                                             method="post" class="d-inline">
+                                          <button type="submit" class="btn btn-danger btn-sm"
+                                                     onclick="return confirm('Bạn có chắc muốn xóa sinh viên này?')">Xóa</button>
+                                     </form>
                         </td>
                     </tr>
 
