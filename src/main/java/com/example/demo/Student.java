@@ -2,6 +2,8 @@ package com.example.demo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -10,6 +12,7 @@ import jakarta.persistence.Table;
 public class Student {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column(name = "name", columnDefinition = "NVARCHAR(255)")
     private String name;
@@ -67,6 +70,6 @@ public class Student {
 
     public void setGender(String gender) {
         this.gender = gender;
-}
+    }
 
 }
