@@ -7,24 +7,32 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @Entity
 @Table(name = "students")
+@Schema(name = "Student", description = "Thông tin sinh viên")
 public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Schema(description = "Mã sinh viên, tự động tạo khi thêm mới", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+    private Integer id;
     @Column(name = "name", columnDefinition = "NVARCHAR(255)")
+    @Schema(description = "Họ và tên sinh viên", example = "Nguyen Van A", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
-    private int age;
+    @Schema(description = "Tuổi sinh viên", example = "20", minimum = "1", requiredMode = Schema.RequiredMode.REQUIRED)
+    private Integer age;
+    @Schema(description = "Địa chỉ email", example = "a@example.com", requiredMode = Schema.RequiredMode.REQUIRED)
     private String email;
     @Column(name = "gender", columnDefinition = "NVARCHAR(20)")
+    @Schema(description = "Giới tính", example = "Nam", requiredMode = Schema.RequiredMode.REQUIRED)
     private String gender;
 
     public Student() {
     }
 
-    public Student(int id, String name, int age, String gender) {
+    public Student(Integer id, String name, Integer age, String gender) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -32,11 +40,11 @@ public class Student {
     }
 
     // Getter & Setter
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -48,11 +56,11 @@ public class Student {
         this.name = name;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
