@@ -112,7 +112,16 @@
         const keyword = value('keyword');
         loadStudents(keyword ? `${api}/search?name=${encodeURIComponent(keyword)}` : api);
     });
-    loadStudents().catch(error => showMessage(error.message, true));
+
+    const query = new URLSearchParams(window.location.search);
+    const requestedId = Number(query.get('id'));
+    const requestedMode = query.get('mode');
+
+    if (requestedId && (requestedMode === 'edit' || requestedMode === 'view')) {
+        editStudent(requestedId).catch(error => showMessage(error.message, true));
+    } else {
+        loadStudents().catch(error => showMessage(error.message, true));
+    }
 </script>
 </body>
 </html>
