@@ -1,92 +1,244 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Danh sách sinh viên</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-    <style>
-        body { background: #f4f7fb; }
-        .student-card { border: 0; border-radius: 1rem; overflow: hidden; }
-        .student-card .card-header { padding: 1rem 1.25rem; }
-        .table th, .table td { vertical-align: middle; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Danh sách sinh viên</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+  <style>
+    body { background: #f4f7fb; }
+    .student-card { border: 0; border-radius: 1rem; overflow: hidden; }
+    .student-card .card-header { padding: 1rem 1.25rem; }
+    .table th, .table td { vertical-align: middle; }
+    .actions { white-space: nowrap; }
+  </style>
 </head>
 <body>
 <div class="container py-4 py-lg-5">
-    <div class="card student-card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h1 class="h3 mb-0">Danh sách sinh viên</h1>
-            <span class="badge text-bg-light">Dữ liệu mẫu</span>
-        </div>
-
-        <div class="card-body">
-            <div class="d-flex flex-column flex-md-row gap-2 mb-4">
-                <input id="search" type="search" class="form-control"
-                       placeholder="Tìm theo tên sinh viên...">
-                <button id="searchButton" class="btn btn-primary text-nowrap">
-                    Tìm kiếm
-                </button>
-                <button id="resetButton" class="btn btn-outline-secondary text-nowrap">
-                    Làm mới
-                </button>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle mb-0">
-                    <thead class="table-dark">
-                    <tr>
-                        <th>ID</th><th>Họ tên</th><th>Tuổi</th>
-                        <th>Giới tính</th><th>Email</th>
-                    </tr>
-                    </thead>
-                    <tbody id="students">
-                    <tr><td>1</td><td>Nguyễn An</td><td>20</td><td>Nam</td><td>sv01@example.com</td></tr>
-                    <tr><td>2</td><td>Trần Bình</td><td>21</td><td>Nam</td><td>sv02@example.com</td></tr>
-                    <tr><td>3</td><td>Lê Chi</td><td>19</td><td>Nữ</td><td>sv03@example.com</td></tr>
-                    <tr><td>4</td><td>Phạm Dũng</td><td>22</td><td>Nam</td><td>sv04@example.com</td></tr>
-                    <tr><td>5</td><td>Hoàng Giang</td><td>20</td><td>Nữ</td><td>sv05@example.com</td></tr>
-                    <tr><td>6</td><td>Võ Hải</td><td>21</td><td>Nam</td><td>sv06@example.com</td></tr>
-                    <tr><td>7</td><td>Đặng Khánh Linh</td><td>19</td><td>Nữ</td><td>sv07@example.com</td></tr>
-                    <tr><td>8</td><td>Bùi Minh</td><td>20</td><td>Nam</td><td>sv08@example.com</td></tr>
-                    <tr><td>9</td><td>Đỗ Ngọc</td><td>22</td><td>Nữ</td><td>sv09@example.com</td></tr>
-                    <tr><td>10</td><td>Phan Quang</td><td>21</td><td>Nam</td><td>sv10@example.com</td></tr>
-                    </tbody>
-                </table>
-                <p id="empty" class="text-center text-muted py-4 d-none mb-0">
-                    Không tìm thấy sinh viên
-                </p>
-            </div>
-        </div>
+  <div class="card student-card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h1 class="h3 mb-0">Danh sách sinh viên</h1>
     </div>
+
+    <div class="card-body">
+      <div class="d-flex flex-column flex-md-row gap-2 mb-4">
+        <input id="search" type="search" class="form-control"
+               placeholder="Nhập tên sinh viên...">
+        <button id="searchButton" class="btn btn-primary text-nowrap">Tìm kiếm</button>
+        <button id="resetButton" class="btn btn-outline-secondary text-nowrap">Làm mới</button>
+        <button id="addButton" class="btn btn-success text-nowrap">+ Thêm sinh viên</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle mb-0">
+          <thead class="table-dark">
+          <tr>
+            <th>ID</th><th>Họ tên</th><th>Tuổi</th>
+            <th>Giới tính</th><th>Email</th><th>Thao tác</th>
+          </tr>
+          </thead>
+          <tbody id="students"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
+<div class="modal fade" id="studentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="studentForm" class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h2 id="modalTitle" class="modal-title fs-5">Thêm sinh viên</h2>
+        <button type="button" class="btn-close btn-close-white"
+                data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="name" class="form-label">Họ tên</label>
+          <input id="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="age" class="form-label">Tuổi</label>
+          <input id="age" type="number" min="1" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="gender" class="form-label">Giới tính</label>
+          <input id="gender" class="form-control" required>
+        </div>
+        <div>
+          <label for="email" class="form-label">Email</label>
+          <input id="email" type="email" class="form-control" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary"
+                data-bs-dismiss="modal">Hủy</button>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h2 class="modal-title fs-5">Chi tiết sinh viên</h2>
+        <button type="button" class="btn-close btn-close-white"
+                data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>ID:</strong> <span id="detailId"></span></p>
+        <p><strong>Họ tên:</strong> <span id="detailName"></span></p>
+        <p><strong>Tuổi:</strong> <span id="detailAge"></span></p>
+        <p><strong>Giới tính:</strong> <span id="detailGender"></span></p>
+        <p class="mb-0"><strong>Email:</strong> <span id="detailEmail"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const search = document.getElementById("search");
-    const rows = [...document.querySelectorAll("#students tr")];
-    const empty = document.getElementById("empty");
+  const sampleStudents = [
+    {id: 1, name: "Nguyễn An", age: 20, gender: "Nam", email: "sv01@example.com"},
+    {id: 2, name: "Trần Bình", age: 21, gender: "Nam", email: "sv02@example.com"},
+    {id: 3, name: "Lê Chi", age: 19, gender: "Nữ", email: "sv03@example.com"},
+    {id: 4, name: "Phạm Dũng", age: 22, gender: "Nam", email: "sv04@example.com"},
+    {id: 5, name: "Hoàng Giang", age: 20, gender: "Nữ", email: "sv05@example.com"},
+    {id: 6, name: "Võ Hải", age: 21, gender: "Nam", email: "sv06@example.com"},
+    {id: 7, name: "Đặng Khánh Linh", age: 19, gender: "Nữ", email: "sv07@example.com"},
+    {id: 8, name: "Bùi Minh", age: 20, gender: "Nam", email: "sv08@example.com"},
+    {id: 9, name: "Đỗ Ngọc", age: 22, gender: "Nữ", email: "sv09@example.com"},
+    {id: 10, name: "Phan Quang", age: 21, gender: "Nam", email: "sv10@example.com"}
+  ];
 
-    function filterStudents() {
-        const keyword = search.value.trim().toLocaleLowerCase("vi");
-        let shown = 0;
+  const storageKey = "baigiuaky-students-demo";
+  let students;
+  try {
+    students = JSON.parse(localStorage.getItem(storageKey)) || sampleStudents;
+  } catch {
+    students = sampleStudents;
+  }
 
-        rows.forEach(row => {
-            const matches = row.cells[1].textContent
-                .toLocaleLowerCase("vi").includes(keyword);
-            row.classList.toggle("d-none", !matches);
-            if (matches) shown++;
-        });
+  const searchInput = document.getElementById("search");
+  const studentBody = document.getElementById("students");
+  const studentModal = new bootstrap.Modal(document.getElementById("studentModal"));
+  const detailModal = new bootstrap.Modal(document.getElementById("detailModal"));
+  const form = document.getElementById("studentForm");
+  let editingId = null;
 
-        empty.classList.toggle("d-none", shown > 0);
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+  }
+
+  function saveStudents() {
+    localStorage.setItem(storageKey, JSON.stringify(students));
+  }
+
+  function renderStudents() {
+    const keyword = searchInput.value.trim().toLocaleLowerCase("vi");
+    const visible = students.filter(student =>
+      student.name.toLocaleLowerCase("vi").includes(keyword)
+    );
+
+    if (visible.length === 0) {
+      studentBody.innerHTML =
+        '<tr><td colspan="6" class="text-center text-muted py-4">Không tìm thấy sinh viên</td></tr>';
+      return;
     }
 
-    document.getElementById("searchButton").addEventListener("click", filterStudents);
-    search.addEventListener("input", filterStudents);
-    document.getElementById("resetButton").addEventListener("click", () => {
-        search.value = "";
-        filterStudents();
-    });
+    studentBody.innerHTML = visible.map(student => `
+      <tr>
+        <td>${student.id}</td>
+        <td>${escapeHtml(student.name)}</td>
+        <td>${student.age}</td>
+        <td>${escapeHtml(student.gender)}</td>
+        <td>${escapeHtml(student.email)}</td>
+        <td class="actions">
+          <button class="btn btn-info btn-sm" data-action="detail" data-id="${student.id}">Chi tiết</button>
+          <button class="btn btn-warning btn-sm" data-action="edit" data-id="${student.id}">Sửa</button>
+          <button class="btn btn-danger btn-sm" data-action="delete" data-id="${student.id}">Xóa</button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function openAddForm() {
+    editingId = null;
+    form.reset();
+    document.getElementById("modalTitle").textContent = "Thêm sinh viên";
+    studentModal.show();
+  }
+
+  document.getElementById("addButton").addEventListener("click", openAddForm);
+  document.getElementById("searchButton").addEventListener("click", renderStudents);
+  searchInput.addEventListener("input", renderStudents);
+  document.getElementById("resetButton").addEventListener("click", () => {
+    searchInput.value = "";
+    renderStudents();
+  });
+
+  studentBody.addEventListener("click", event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+
+    const id = Number(button.dataset.id);
+    const student = students.find(item => item.id === id);
+    if (!student) return;
+
+    if (button.dataset.action === "detail") {
+      for (const field of ["id", "name", "age", "gender", "email"]) {
+        document.getElementById("detail" + field[0].toUpperCase() + field.slice(1))
+          .textContent = student[field];
+      }
+      detailModal.show();
+    }
+
+    if (button.dataset.action === "edit") {
+      editingId = id;
+      document.getElementById("modalTitle").textContent = "Sửa sinh viên";
+      for (const field of ["name", "age", "gender", "email"]) {
+        document.getElementById(field).value = student[field];
+      }
+      studentModal.show();
+    }
+
+    if (button.dataset.action === "delete" &&
+        confirm("Bạn có chắc muốn xóa sinh viên này?")) {
+      students = students.filter(item => item.id !== id);
+      saveStudents();
+      renderStudents();
+    }
+  });
+
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    const studentData = {
+      name: document.getElementById("name").value.trim(),
+      age: Number(document.getElementById("age").value),
+      gender: document.getElementById("gender").value.trim(),
+      email: document.getElementById("email").value.trim()
+    };
+
+    if (editingId === null) {
+      const nextId = Math.max(0, ...students.map(student => student.id)) + 1;
+      students.push({id: nextId, ...studentData});
+    } else {
+      students = students.map(student =>
+        student.id === editingId ? {...student, ...studentData} : student
+      );
+    }
+
+    saveStudents();
+    renderStudents();
+    studentModal.hide();
+  });
+
+  renderStudents();
 </script>
 </body>
 </html>
